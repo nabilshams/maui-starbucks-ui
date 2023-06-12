@@ -9,7 +9,7 @@ on:
 jobs:
   buildAndroid:
 
-    runs-on: self-hosted
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -17,11 +17,17 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-        
+
     - name: List installed .NET info
       shell: pwsh
       run: dotnet --info
-      
+
+    - name: Install .NET MAUI
+      shell: bash
+      run: |
+        dotnet nuget locals all --clear 
+        dotnet workload install maui --source https://aka.ms/dotnet6/nuget/index.json --source https://api.nuget.org/v3/index.json
+        dotnet workload install android ios maccatalyst tvos macos maui wasm-tools --source https://aka.ms/dotnet6/nuget/index.json --source https://api.nuget.org/v3/index.json
     - name: Restore nuget packages
       run: |
         cd src/MauiStarbucks
@@ -32,6 +38,12 @@ jobs:
       run: |
         cd src/MauiStarbucks
         dotnet publish -f:net6.0-android -c:Release
+    
+    - uses: actions/upload-artifact@v2
+      with:
+        name: artifacts-android
+        path: |
+          src/MauiStarbucks\bin\Release\net6.0-android\publish\*.apk
     
     - name: Download APK
       uses: actions/upload-artifact@v2
