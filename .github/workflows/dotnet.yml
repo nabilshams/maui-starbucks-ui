@@ -28,7 +28,6 @@ jobs:
         dotnet restore MauiStarbucks.sln
    
     - name : Build Android App
-      shell: bash
       run: |
         cd src/MauiStarbucks
         dotnet publish -f:net6.0-android -c:Release
